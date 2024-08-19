@@ -1,0 +1,74 @@
+{% extends 'polls/base.html' %}
+{% load static %}
+
+{% block css %}
+    {#<link href="{% static 'vendor/css/index.css' %}" rel="stylesheet">#}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+{% endblock %}
+
+{% block content %}
+    <main>
+        <div class="container col-lg-7 text-center mb-5 mt-5 ">
+            <div class="jumbotron text-center mt-5">
+                <h1 class="display-4">Вітаємо на сайті анонімних опитувань!</h1>
+                <p class="lead">Тут ви можете переглянути доступні опитування та взяти участь у них.</p>
+                <a class="btn btn-secondary btn-lg mb-2" href="{% url 'polls:index' %}" role="button">
+                    Перегляд існуючих опитувань
+                </a>
+                <hr class="my-4">
+                <p>Опитування – це потужний інструмент, який дозволяє зібрати важливу інформацію та думки.
+                    Ми цінуємо вашу анонімність та гарантуємо, що всі відповіді залишатимуться конфіденційними.
+                    Беріть участь в опитуваннях,
+                    щоб допомогти нам зрозуміти ваші потреби та зробити наші сервіси кращими!</p>
+                <p>Ваші відповіді допоможуть нам вдосконалити послуги та зробити їх більш корисними для вас.</p>
+                <hr class="my-4">
+                {% if user.is_authenticated %}
+                    <a class="btn btn-primary btn-lg mb-2" href="{% url 'polls:create_survey' %}" role="button">
+                        Почати створювати опитування
+                    </a>
+
+                {% else %}
+                    <p>Щоб почати створювати опитування ви маєте мати обліковий запис зі статусом  "адмін", 
+                        будь ласка, авторизуйтесь.</p>
+                    <a class="btn btn-primary btn-lg mb-2" href="{% url 'users:login' %}" role="button">
+                        Вхід
+                    </a>
+{#                    <a class="btn btn-secondary btn-lg mb-2" href="{% url 'users:register' %}" role="button">#}
+{#                        Реєстрація#}
+{#                    </a>#}
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+
+    <script>
+        $(document).ready(function () {
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+            {% if messages %}
+                {% for message in messages %}
+                    toastr.{{ message.tags }}('{{ message }}');
+                {% endfor %}
+            {% endif %}
+
+        });
+    </script>
+{% endblock %}

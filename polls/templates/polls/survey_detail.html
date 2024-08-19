@@ -1,0 +1,103 @@
+{% extends 'polls/base.html' %}
+{% load static %}
+
+{% block css %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'vendor/css/detail_survey.css' %} ">
+    
+{% endblock %}
+{% block content %}
+<div class="container mb-5 mt-5 col-lg-6">
+    <h1>{{ survey.title }}</h1>
+    {% if survey.author == this_user %}
+    <div class="mb-3 text">
+        <div class="d-inline-block">
+            <a href="{% url 'polls:survey_statistics' survey.slug %}" class="btn btn-success btn-not-author">
+                <i class="fas fa-chart-bar"></i> Результати
+            </a>
+        </div>
+        <div class="d-inline-block ">
+            <a href="{% url 'polls:edit_survey' survey.slug %}" class="btn btn-warning btn-not-author">
+                <i class="fas fa-edit"></i> Редагувати
+            </a>
+            <form method="POST" action="{% url 'polls:delete_survey' survey.slug %}" onsubmit="return confirmDelete()" style="display: inline-block;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> Видалити
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+    <ul>
+        {% for question in questions %}
+        <li>
+            <p>{{ forloop.counter }}. {{ question.text }} ({{ question.get_question_type_display }})</p>
+            {% if question.question_type == 'multiple_choice' %}
+            <ul>
+                {% for option in question.answeroption_set.all %}
+                <li>{{ option.option_text }}</li>
+                {% endfor %}
+            </ul>
+            {% elif question.question_type == 'scale' %}
+            <div class="scale-container">
+                <span>{{ question.min_value }}</span>
+                <input type="range" min="{{ question.min_value }}" max="{{ question.max_value }}" value="{{ question.min_value }}" id="range_{{ question.id }}" oninput="updateRangeValue({{ question.id }})">
+                <span>{{ question.max_value }}</span>
+            </div>
+            <div class="text-md-center">
+                <output class="scale-value" id="range_value_{{ question.id }}">{{ question.min_value }}</output>
+            </div>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% if survey.show_author %}
+    <div class="text-md-center mb-1">
+        <h2>Автор опитування: {{ survey.author }}</h2>
+    </div>
+    {% endif %}
+    <div class="action-buttons">
+        <div class="input-group mb-3">
+            <input type="text" value="{{ domain_name }}{% url 'polls:respond_to_survey' survey.slug %}" id="survey-link-{{ forloop.counter }}" class="form-control" readonly>
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('survey-link-{{ forloop.counter }}')">Copy Link</button>
+            </div>
+        </div>
+        {% if survey.survey_visibility == 'public' %}
+            {% if survey.author != this_user %}
+        <a href="{% url 'polls:respond_to_survey' survey.slug %}" class="btn btn-primary mb-3">Відповісти</a>
+        
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <div class="text-md-center">
+        <a href="{% url 'polls:index' %}" class="btn btn-secondary">Повернутись до списку опитувань</a>
+    </div>
+</div>
+<div id="notification" style="display: none; color: red;"></div>
+   <script>
+
+    function confirmDelete() {
+        return confirm('Ви впевнені, що хочете видалити це опитування?');
+    }
+
+    function copyToClipboard(elementId) {
+        var copyText = document.getElementById(elementId);
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); // For mobile devices
+        document.execCommand("copy");
+    }
+
+    function updateRangeValue(questionId) {
+        var rangeInput = document.getElementById('range_' + questionId);
+        var rangeValue = document.getElementById('range_value_' + questionId);
+        rangeValue.textContent = rangeInput.value;
+    }
+</script>
+    
+
+{% endblock %}

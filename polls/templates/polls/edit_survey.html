@@ -1,0 +1,220 @@
+{% extends 'polls/base.html' %}
+{% load static %}
+
+{% block css %}
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/solid.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/solid.min.js"></script>
+<script src="https://www.google.com/recaptcha/api.js?render={{ RECAPTCHA_PUBLIC_KEY }}"></script>
+<link href="{% static 'vendor/css/edit_survey.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container col-lg-6 mb-5 mt-5">
+    <h1>Редагування опитування</h1>
+    <form id="survey-form" method="post">
+        {% csrf_token %}
+        <label for="title">Назва опитування:</label>
+        <input type="text" id="title" name="title" value="{{ survey.title }}">
+        <div id="questions">
+            {% for question in questions %}
+            <div class="question" data-question-idx="{{ forloop.counter0 }}">
+                <label for="question-{{ forloop.counter0 }}">Питання:</label>
+                <input type="text" id="question-{{ forloop.counter0 }}" class="question-text" value="{{ question.text }}">
+                <label for="question-type-{{ forloop.counter0 }}">Type:</label>
+                <select class="question-type form-select" id="question-type-{{ forloop.counter0 }}">
+                    <option value="text" {% if question.question_type == 'text' %}selected{% endif %}>Text</option>
+                    <option value="multiple_choice" {% if question.question_type == 'multiple_choice' %}selected{% endif %}>Multiple Choice</option>
+                    <option value="scale" {% if question.question_type == 'scale' %}selected{% endif %}>Scale</option>
+                </select>
+                <div class="answer-options">
+                    {% if question.question_type == 'multiple_choice' %}
+                    {% for option in question.answeroption_set.all %}
+                    <div class="answer-option">
+                        <label for="option-{{ forloop.parentloop.counter0 }}-{{ forloop.counter0 }}">Варіант:</label>
+                        <input type="text" id="option-{{ forloop.parentloop.counter0 }}-{{ forloop.counter0 }}" class="option-text" value="{{ option.option_text }}">
+                        <button type="button" class="remove-answer-option">Видалити</button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                {% if question.question_type == 'multiple_choice' %}
+                <button type="button" class="add-answer-option" data-question-idx="{{ forloop.counter0 }}">Додати варіант відповіді</button>
+                {% endif %}
+                {% if question.question_type == 'scale' %}
+                <label for="scale-min-{{ forloop.counter0 }}">Min:</label>
+                <input type="number" id="scale-min-{{ forloop.counter0 }}" class="scale-min" value="{{ question.min_value }}">
+                <label for="scale-max-{{ forloop.counter0 }}">Max:</label>
+                <input type="number" id="scale-max-{{ forloop.counter0 }}" class="scale-max" value="{{ question.max_value }}">
+                <p></p>
+                {% endif %}
+                <button type="button" class="remove-question">Видалити запитання</button>
+            </div>
+            {% endfor %}
+        </div>
+        <input type="hidden" name="questions_data" id="questions_data">
+        <input type="hidden" name="recaptcha_token" id="recaptcha_token">
+        <button type="button" id="add-question">Додати питання</button>
+        <div class="text-center">
+            <button type="submit">Зберегти опитування</button>
+        </div>
+    </form>
+</div>
+<script>
+$(document).ready(function () {
+    var questionIdx = {{ questions|length }};
+
+    $("#add-question").click(function () {
+        var questionHtml = `
+        <div class="question" data-question-idx="${questionIdx}">
+            <label for="question-${questionIdx}">Питання:</label>
+            <input type="text" id="question-${questionIdx}" class="question-text">
+            <label for="question-type-${questionIdx}">Type:</label>
+            <select class="question-type form-select" id="question-type-${questionIdx}">
+                <option value="text" selected>Text</option>
+                <option value="multiple_choice">Multiple Choice</option>
+                <option value="scale">Scale</option>
+            </select>
+            <p></p>
+            <div class="answer-options"></div>
+            <button type="button" class="add-answer-option" data-question-idx="${questionIdx}" style="display:none;">Додати варіант відповіді</button>
+            <button type="button" class="remove-question">Видалити запитання</button>
+        </div>`;
+        $("#questions").append(questionHtml);
+        questionIdx++;
+    });
+
+    $(document).on('change', '.question-type', function () {
+        var questionType = $(this).val();
+        var answerOptionsDiv = $(this).siblings('.answer-options');
+        var addAnswerOptionBtn = $(this).siblings('.add-answer-option');
+        answerOptionsDiv.empty(); // Clear existing options
+
+        if (questionType === 'text') {
+            answerOptionsDiv.append('<p>Текстові запитання не мають попередньо визначених варіантів відповідей.</p>');
+            addAnswerOptionBtn.hide();
+        } else if (questionType === 'multiple_choice') {
+            addAnswerOptionBtn.show();
+        } else if (questionType === 'scale') {
+            var scaleHtml = `
+            <label for="scale-min-${questionIdx}">Min:</label>
+            <input type="number" id="scale-min-${questionIdx}" class="scale-min">
+            <label for="scale-max-${questionIdx}">Max:</label>
+            <input type="number" id="scale-max-${questionIdx}" class="scale-max">
+            <p></p>`;
+            answerOptionsDiv.append(scaleHtml);
+            addAnswerOptionBtn.hide();
+        }
+    });
+
+    $(document).on('click', '.add-answer-option', function () {
+        var questionIdx = $(this).data('question-idx');
+        var answerOptionsDiv = $(this).siblings('.answer-options');
+        var optionIdx = answerOptionsDiv.children('.answer-option').length;
+        var optionHtml = `
+        <div class="answer-option">
+            <label for="option-${questionIdx}-${optionIdx}">Варіант:</label>
+            <input type="text" id="option-${questionIdx}-${optionIdx}" class="option-text">
+            <button type="button" class="remove-answer-option">Видалити</button>
+        </div>`;
+        answerOptionsDiv.append(optionHtml);
+    });
+
+    $(document).on('click', '.remove-question', function () {
+        $(this).closest('.question').remove();
+    });
+
+    $(document).on('click', '.remove-answer-option', function () {
+        $(this).closest('.answer-option').remove();
+    });
+
+    $("#survey-form").submit(function (event) {
+        event.preventDefault();
+        var isValid = true;
+
+        var title = $("#title").val().trim();
+        if (!title) {
+            isValid = false;
+            toastr.error("Назва опитування не може бути порожньою.");
+        }
+
+        var questions = [];
+        $(".question").each(function () {
+            var questionIdx = $(this).data('question-idx');
+            var questionText = $(this).find(".question-text").val().trim();
+            var questionType = $(this).find(".question-type").val();
+
+            if (!questionText) {
+                isValid = false;
+                toastr.error("Всі питання мають мати текст.");
+                return false; // Break the each loop
+            }
+
+            if (!questionType) {
+                isValid = false;
+                toastr.error("Всі питання повинні мати тип.");
+                return false; // Break the each loop
+            }
+
+            var options = [];
+
+            if (questionType === 'multiple_choice') {
+                $(this).find(".answer-option .option-text").each(function () {
+                    var optionText = $(this).val().trim();
+                    if (!optionText) {
+                        isValid = false;
+                        toastr.error("Кожен варіант відповіді має містити текст.");
+                        return false; // Break the each loop
+                    }
+                    options.push(optionText);
+                });
+                if (options.length === 0) {
+                    isValid = false;
+                    toastr.error("Питання з декількома відповідями повинні мати принаймні один варіант.");
+                    return false; // Break the each loop
+                }
+            } else if (questionType === 'scale') {
+                var min = parseInt($(this).find(".scale-min").val(), 10);
+                var max = parseInt($(this).find(".scale-max").val(), 10);
+                if (isNaN(min) || isNaN(max) || min < -10000 || max > 10000) {
+                    isValid = false;
+                    toastr.error("Питання про шкалу повинні мати мінімальне та максимальне значення в діапазоні від -10000 до 10000.");
+                    return false; // Break the each loop
+                }
+                options = [min, max];
+            }
+
+            questions.push({
+                text: questionText,
+                question_type: questionType,
+                options: options
+            });
+        });
+
+        if (!isValid) {
+            return false;
+        }
+
+        grecaptcha.ready(function () {
+            grecaptcha.execute('{{ RECAPTCHA_PUBLIC_KEY }}', { action: 'submit' }).then(function (token) {
+                if (!token) {
+                    toastr.error("Не вдалося отримати токен reCAPTCHA.");
+                    return false;
+                }
+
+                // Add the token to the form
+                $("#recaptcha_token").val(token);
+
+                // Add questions data to the form
+                $("#questions_data").val(JSON.stringify(questions));
+
+                // Submit the form
+                $("#survey-form")[0].submit();
+            }).catch(function (error) {
+                toastr.error("Помилка reCAPTCHA: " + error);
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,227 @@
+@import url('https://fonts.googleapis.com/css2?family=Allerta+Stencil&display=swap');
+
+
+#foto {
+    background-color: #f8f9fa;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+}
+
+.navbar-nav > li > a {
+
+    text-transform: uppercase;
+    font-size: 12px;
+    margin-right: 20px;
+    color: #fff;
+}
+
+
+.navbar-toggler {
+    padding: .20rem .50rem;
+    font-size: 1.25rem;
+    line-height: 1;
+    background-color: transparent;
+    border: 1px solid white;
+
+}
+
+.nav-link {
+
+    color: #fff !important;
+}
+
+
+.wrapper {
+    width: 100%;
+    position: absolute;
+    height: 100%;
+    background-color: #000;
+    clip-path: polygon(81% 0, 100% 0, 100% 50%, 100% 100%, 71% 100%);
+    transition: 1s all;
+}
+
+.navbar-brand {
+
+    color: #fff;
+    font-family: 'Allerta Stencil', sans-serif;
+    margin-bottom: 4px;
+    font-size: 27px;
+}
+
+.navbar-red:hover .wrapper {
+
+    clip-path: polygon(81% 0, 100% 0, 100% 50%, 100% 100%, 65% 100%);
+
+}
+
+.navbar-brand:hover {
+
+    color: #fff;
+
+}
+
+.navbar-red {
+
+    background-color: green;
+    color: #fff;
+
+}
+
+.all-show {
+
+    z-index: 10;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    /*margin-top: 20px;*/
+}
+
+.neon-text {
+    color: #fff;
+    text-shadow: 0 0 5px #37b584,
+    0 0 10px #37b584,
+    0 0 20px #37b584,
+    0 0 40px #37b584;
+
+    font-size: 5rem;
+    animation: neon-animation 1.5s infinite alternate;
+}
+
+@keyframes neon-animation {
+    from {
+        text-shadow: 0 0 5px #00ff23,
+        0 0 10px #00ff23,
+        0 0 20px #00ff23,
+        0 0 40px #00ff23,
+        0 0 80px rgba(0, 255, 35, 0.42);
+
+    }
+    to {
+        text-shadow: 0 0 5px #227a1e,
+        0 0 10px #227a1e,
+        0 0 20px #227a1e,
+        0 0 40px #227a1e,
+        0 0 80px #227a1e;
+    }
+}
+
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+    transition: color 0.3s, transform 0.3s;
+}
+
+.navbar-brand:hover {
+    color: #dc3545;
+    transform: scale(1.1);
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.8);
+    transition: color 0.3s, transform 0.3s;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: rgba(255, 255, 255, 1);
+    transform: scale(1.05);
+}
+
+.navbar-dark .navbar-nav .nav-item.active .nav-link {
+    color: #ffffff;
+}
+
+.dropdown-menu {
+    background-color: #343a40;
+    border: none;
+    transition: opacity 0.3s;
+}
+
+.dropdown-item {
+    color: #ffffff;
+    transition: background-color 0.3s;
+}
+
+.dropdown-item:hover {
+    background-color: #495057;
+}
+
+.container-fluid {
+    padding: 10px;
+}
+
+.navbar-toggler {
+    border: none;
+    transition: transform 0.3s;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=UTF8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%28255, 255, 255, 1%29' stroke-width='2' linecap='round' linejoin='round' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+.navbar-toggler:hover {
+    transform: rotate(90deg);
+}
+
+footer {
+    background-color: #343a40;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.footer a {
+    color: #ffffff;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer a:hover {
+    color: #f8f9fa;
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+    .navbar-nav {
+        text-align: center;
+    }
+
+    .navbar-brand {
+        margin-bottom: 10px;
+    }
+
+    .navbar-toggler {
+        margin-top: 10px;
+    }
+
+    .navbar-collapse {
+        text-align: center;
+    }
+
+    .footer {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+
+    .navbar-toggler {
+        font-size: 0.9rem;
+    }
+
+    .navbar-nav .nav-link {
+        font-size: 0.9rem;
+    }
+}

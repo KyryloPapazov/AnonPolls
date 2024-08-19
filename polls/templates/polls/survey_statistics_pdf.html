@@ -1,0 +1,83 @@
+{% extends 'polls/base.html' %}
+{% load static %}
+
+
+
+{% block css %}
+	
+{% endblock %}
+
+  <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h1, h2 {
+            color: #343a40;
+        }
+        .chart-container {
+            width: 100%;
+            margin: 20px 0;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .table th {
+            background-color: #f2f2f2;
+        }
+    </style>
+
+
+{% block content %}
+	
+ <h1>Survey Statistics for "{{ survey.title }}"</h1>
+
+    {% for question in questions %}
+        <h2>Question {{ forloop.counter }}: {{ question.text }}</h2>
+        
+        {% if question.type == "multiple_choice" %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Answer</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for answer, count in question.answer_counts.items %}
+                        <tr>
+                            <td>{{ answer }}</td>
+                            <td>{{ count }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% elif question.type == "scale" %}
+            <p>Average Value: {{ question.average }}</p>
+        {% elif question.type == "text" %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Answer</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for answer, count in question.answer_counts.items %}
+                        <tr>
+                            <td>{{ answer }}</td>
+                            <td>{{ count }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p>Most Frequent Answer: {{ question.most_frequent }}</p>
+        {% endif %}
+    {% endfor %}
+{% endblock %}
+
+

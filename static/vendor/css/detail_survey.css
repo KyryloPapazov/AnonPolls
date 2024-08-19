@@ -1,0 +1,148 @@
+#notification {
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.container h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.container ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.container li {
+    background-color: #fafafa;
+    margin-bottom: 10px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.container li p {
+    margin: 0;
+    font-weight: bold;
+}
+
+.container li ul {
+    margin-top: 10px;
+}
+
+.container li ul li {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    margin-bottom: 5px;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.container .action-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.container .action-buttons input[type="text"] {
+    flex-grow: 1;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.container .action-buttons button {
+    margin-left: 10px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+}
+
+.container .action-buttons button:hover {
+    background-color: #45a049;
+}
+
+.container .text {
+    margin-top: 20px;
+}
+
+.container .text a {
+
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.container .text button {
+
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.container .text a:hover {
+    background-color: #0056b3;
+}
+
+.container .text form input[type="submit"] {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.container .text form input[type="submit"]:hover {
+    background-color: darkred;
+}
+
+.container .text-md-center {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.container .text-md-center a {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.container .action-buttons a {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-left: 5px;
+}
+
+.container .text-md-center a:hover {
+    background-color: #0056b3;
+}
+
+.scale-container {
+    display: flex;
+    align-items: center;
+}
+
+.scale-container input[type="range"] {
+    margin: 0 10px;
+    flex: 1;
+}
+
+.scale-value {
+    font-weight: bold;
+}

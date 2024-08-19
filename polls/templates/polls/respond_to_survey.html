@@ -1,0 +1,76 @@
+{% extends 'polls/base.html' %}
+{% load static %}
+
+
+{% block css %}
+    <script src="https://www.google.com/recaptcha/api.js?render=6LfGNvYpAAAAADs8fhuI4sH5PottWSNGppoEblCD"></script>
+    <link rel="stylesheet" href="{% static 'vendor/css/respond.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container mb-5 mt-5">
+    <h1>{{ survey.title }}</h1>
+    <form id="demo-form" method="post">
+        {% csrf_token %}
+        <ul>
+        <p>Відповідайте обачно, відповідь можна надати лише один раз без можливості редагування</p>
+            {% for question in questions %}
+            <li>
+                <p>{{ forloop.counter }}. {{ question.text }} ({{ question.get_question_type_display }})</p>
+                {% if question.question_type == 'multiple_choice' %}
+                <ul>
+                    {% for option in question.answeroption_set.all %}
+                    <li>
+                        <input type="radio" id="option_{{ option.id }}" name="question_{{ question.id }}" value="{{ option.option_text }}">
+                        <label for="option_{{ option.id }}">{{ option.option_text }}</label>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% elif question.question_type == 'text' %}
+                <input type="text" name="question_{{ question.id }}">
+                {% elif question.question_type == 'scale' %}
+                <div class="scale-container">
+                    <span>{{ question.min_value }}</span>                    
+                    <input name="question_{{ question.id }}" type="range" min="{{ question.min_value }}" max="{{ question.max_value }}" value="0" id="range_{{ question.id }}" oninput="updateRangeValue({{ question.id }})">
+                    <span>{{ question.max_value }}</span>
+                </div>
+                <div class="text-md-center">
+                    <output class="scale-value" id="range_value_{{ question.id }}">{{ question.min_value }}</output>
+                </div>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+
+        <button class="g-recaptcha"
+                data-sitekey="6LfGNvYpAAAAADs8fhuI4sH5PottWSNGppoEblCD"
+                data-callback='onSubmit'
+                data-action='submit' type="submit">Відповісти
+        </button>
+    </form>
+</div>
+
+
+
+    <script>
+
+
+        function updateRangeValue(questionId) {
+            var rangeInput = document.getElementById('range_' + questionId);
+            var rangeValue = document.getElementById('range_value_' + questionId);
+            rangeValue.textContent = rangeInput.value;
+        }
+
+        function onSubmit(token) {
+            document.getElementById("demo-form").submit();
+        }
+
+        window.addEventListener('error', function (event) {
+            console.error('Error occurred:', event.error);
+            // Implement logic to handle or log the error
+        });
+    </script>
+    
+    
+    
+{% endblock %}

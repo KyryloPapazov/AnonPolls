@@ -1,0 +1,25 @@
+{% extends 'polls/base.html' %}
+{% load static %}
+
+
+{% block css %}
+	<link href="{% static 'vendor/css/products.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+     <h1>{{ survey.title }}</h1>
+    <ul>
+        {% for detail in question_details %}
+            <li>
+                <strong>{{ detail.question.text }} ({{ detail.question.get_question_type_display }})</strong>
+                <ul>
+                    {% for option in detail.answer_options %}
+                        <li>{{ option.option_text }}</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'index' %}">Back to polls</a>
+
+{% endblock %}

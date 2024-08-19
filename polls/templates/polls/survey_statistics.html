@@ -1,0 +1,80 @@
+{% extends 'polls/base.html' %}
+{% load static %}
+
+{% block css %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- jQuery -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="{% static 'vendor/css/statistics.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div id="notification" style="display: none; color: red;"></div>
+    <div class="container mb-5 mt-5">
+        <h1 class="text-center">Статистика для опитування: {{ survey.title }}</h1>
+        <div class="download-buttons">
+            <a href="{% url 'polls:download_survey_pdf' survey.slug %}">Завантажити PDF</a>
+
+        </div>
+        <div class="section">
+            <h2>Основна статистика</h2>
+            <table>
+                <tr>
+                    <th>Питання</th>
+                    <th>Тип питання</th>
+                    <th>Всього відповідей</th>
+                    <th>Найпопулярніша відповідь</th>
+                </tr>
+                {% for stat in statistics %}
+                    <tr>
+                        <td>{{ stat.question }}</td>
+                        <td>{{ stat.question_type }}</td>
+                        <td>{{ stat.total_responses }}</td>
+                        <td>{{ stat.most_popular_answer|safe }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="section text-center">
+            <h2>Статистика питань з варіантами відповідей</h2>
+            {% for question, chart in pie_charts.items %}
+                <div>
+                    <h3>{{ question }}</h3>
+                    <img src="data:image/png;base64,{{ chart }}" alt="Pie chart for {{ question }}">
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="section text-center">
+            <h2>Статистика питань з інтервальною шкалою</h2>
+            {% for question, chart in line_charts.items %}
+                <div>
+                    <h3>{{ question }}</h3>
+                    <img src="data:image/png;base64,{{ chart }}" alt="Bar chart for {{ question }}">
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const notification = document.getElementById('notification');
+
+            fetch(window.location.href, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    if (response.status === 403) {
+                        return response.json().then(data => {
+                            notification.innerText = data.error;
+                            notification.style.display = 'block';
+                        });
+                    }
+                });
+        });
+    </script>
+{% endblock %}
